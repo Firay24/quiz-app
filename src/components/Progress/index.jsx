@@ -1,8 +1,9 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 
-function Progress() {
+function Progress({ countDone }) {
   return (
-    <div>3/5 questions</div>
+    <div>{`${countDone}/5 questions`}</div>
   );
 }
 

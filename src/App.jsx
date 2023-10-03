@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 
 function App() {
   const [questions, setQuestions] = useState({ error: false, data: [] });
+  const [countDone, setCountDone] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   const getQuestionsHandling = async () => {
@@ -21,6 +22,10 @@ function App() {
     } catch (error) {
       setQuestions({ error: true, data: [] });
     }
+  };
+
+  const handleCountDone = (count) => {
+    setCountDone(count);
   };
 
   const onClickStartButtonHandler = (value) => {
@@ -34,11 +39,11 @@ function App() {
   return (
     <div>
       <header className="bg-white drop-shadow py-1 fixed top-0 left-0 w-full z-10">
-        <Navbar />
+        <Navbar countDone={countDone && countDone} />
       </header>
       <main className="mt-24">
         <Routes>
-          <Route path="/" element={<Question item={questions.data.results && questions.data.results} />} />
+          <Route path="/" element={<Question item={questions.data.results && questions.data.results} countDone={handleCountDone} />} />
         </Routes>
       </main>
     </div>

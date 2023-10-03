@@ -9,7 +9,7 @@ import { AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
 import Question from './question';
 import Options from './options';
 
-function QuestionPage({ item }) {
+function QuestionPage({ item, countDone }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
@@ -87,6 +87,10 @@ function QuestionPage({ item }) {
       wrong: incorrectCount,
     });
   }, [answeredQuestions]);
+
+  useEffect(() => {
+    countDone(result.done);
+  }, [result]);
 
   const isQuizFinished = item && currentIndex === (item.length);
 
