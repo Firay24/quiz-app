@@ -1,3 +1,6 @@
+/* eslint-disable max-len */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-plusplus */
@@ -6,13 +9,19 @@
 import React, { useEffect, useState } from 'react';
 import Button from 'components/Button';
 import { AiOutlineRight, AiOutlineLeft } from 'react-icons/ai';
+import PreQuiz from 'pages/Pre';
+import Loading from 'components/Loading';
 import Question from './question';
 import Options from './options';
 
-function QuestionPage({ item, countDone }) {
+function QuestionPage({
+  item, countDone, onClickStart, isLoading, isRestartedButton, quizFinished, timesUp,
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [shuffledAnswers, setShuffledAnswers] = useState([]);
+  const [isStart, setIsStart] = useState(false);
+  const [isRestarted, setIsRestarted] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const answerOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const [result, setResult] = useState({
@@ -42,6 +51,18 @@ function QuestionPage({ item, countDone }) {
     }
   };
 
+  const handleRestart = () => {
+    setIsStart(true);
+    setIsRestarted(true);
+    setCurrentIndex(0);
+    setAnsweredQuestions([]);
+    setResult({
+      done: 0,
+      correct: 0,
+      wrong: 0,
+    });
+  };
+
   const handleAnswer = (selected) => {
     setSelectedAnswer(selected);
     if (item && item[currentIndex]) {
@@ -61,6 +82,10 @@ function QuestionPage({ item, countDone }) {
         setCurrentIndex((prevIndex) => prevIndex + 1);
       }
     }
+  };
+
+  const handleStartButton = (value) => {
+    setIsStart(value);
   };
 
   useEffect(() => {
@@ -92,6 +117,10 @@ function QuestionPage({ item, countDone }) {
     countDone(result.done);
   }, [result]);
 
+  useEffect(() => {
+    onClickStart(isStart);
+  }, [isStart]);
+
   const isQuizFinished = item && currentIndex === (item.length);
 
   useEffect(() => {
@@ -103,57 +132,78 @@ function QuestionPage({ item, countDone }) {
     }
   }, [item, currentIndex]);
 
-  console.log(result);
-  console.log(answeredQuestions);
+  useEffect(() => {
+    isRestartedButton(isRestarted);
+  }, [isRestarted]);
+
+  useEffect(() => {
+    quizFinished(isQuizFinished);
+  }, [isQuizFinished]);
 
   return (
     <div className="flex flex-col items-center">
-      <div className="w-1/2">
-        {isQuizFinished ? (
-          <div>
-            <h2>Quiz Selesai</h2>
-            <p>
-              Benar:
-              {' '}
-              {result.correct}
-            </p>
-            <p>
-              Salah:
-              {' '}
-              {result.wrong}
-            </p>
+      {!isStart ? (
+        <PreQuiz onClickStart={handleStartButton} />
+      ) : isLoading ? (
+        <Loading />
+      ) : (
+        <div className="w-1/2">
+          <div className="w-full">
+            {isQuizFinished || !timesUp ? (
+              <div>
+                <h2>Quiz Selesai</h2>
+                <p>
+                  Benar:
+                  {' '}
+                  {result.correct}
+                </p>
+                <p>
+                  Salah:
+                  {' '}
+                  {result.wrong}
+                </p>
+              </div>
+            ) : (
+              item && item[currentIndex] && (
+              <Question item={item[currentIndex]} />
+              )
+            )}
           </div>
-        ) : (
-          item && item[currentIndex] && (
-            <Question item={item[currentIndex]} />
-          )
-        )}
-      </div>
-      <div className="mt-5 w-1/2">
-        {isQuizFinished ? null : (
-          shuffledAnswers.map((answer, index) => (
-            <Options
-              key={index}
-              answer={answer}
-              answerOptions={answerOptions[index]}
-              handleAnswer={handleAnswer}
-              isSelected={selectedAnswer === answer}
-            />
-          ))
-        )}
-      </div>
-      <div className="flex justify-between w-1/2 mt-5">
-        <Button
-          text={<AiOutlineLeft />}
-          style="border hover:bg-gray-400 bg-gray-300"
-          onClick={() => handlePrev()}
-        />
-        <Button
-          text={<AiOutlineRight />}
-          style="text-white bg-blue-500 hover:bg-blue-600"
-          onClick={() => handleNext()}
-        />
-      </div>
+          <div className="mt-5 w-full">
+            {isQuizFinished || !timesUp ? null : (
+              shuffledAnswers.map((answer, index) => (
+                <Options
+                  key={index}
+                  answer={answer}
+                  answerOptions={answerOptions[index]}
+                  handleAnswer={handleAnswer}
+                  isSelected={answeredQuestions[currentIndex] && answer === answeredQuestions[currentIndex].selected}
+                />
+              ))
+            )}
+          </div>
+          {
+            !isQuizFinished || timesUp ? (
+              <div className="flex justify-between w-full mt-5">
+                <Button
+                  text={<AiOutlineLeft />}
+                  style="border hover:bg-gray-400 bg-gray-300"
+                  onClick={() => handlePrev()}
+                />
+                <Button
+                  text={<AiOutlineRight />}
+                  style="text-white bg-blue-500 hover:bg-blue-600"
+                  onClick={() => handleNext()}
+                />
+              </div>
+            ) : (
+              <div className="mt-5">
+                <Button onClick={handleRestart} text="Try Again" style="text-white bg-blue-500 hover:bg-blue-600" />
+              </div>
+            )
+          }
+        </div>
+      )}
     </div>
   );
 }

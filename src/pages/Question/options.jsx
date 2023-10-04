@@ -18,7 +18,7 @@ function Options({
 
   const containerClasses = `flex items-center gap-x-3 p-2 mb-3 rounded-full
   ${isHovered ? 'border-white bg-blue-500 text-white' : 'bg-white border-gray-400'}
-  ${isSelected ? 'selected' : ''}`;
+  ${isSelected ? 'bg-gray-400' : null}`;
 
   const handleClick = () => {
     handleAnswer(answer);

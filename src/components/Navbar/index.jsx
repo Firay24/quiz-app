@@ -4,7 +4,9 @@ import Progress from 'components/Progress';
 import Timer from 'components/Timer';
 import Profile from 'components/Profile';
 
-function Navbar({ countDone }) {
+function Navbar({
+  countDone, isQuizFinished, isStart, isLoading, isActiveTimer,
+}) {
   return (
     <div className="flex justify-between mx-10 my-5">
       <div className="font-medium">
@@ -15,7 +17,12 @@ function Navbar({ countDone }) {
       </div>
       <div className="flex gap-x-5">
         <div>
-          <Timer />
+          <Timer
+            isQuizFinished={isQuizFinished}
+            isStart={isStart}
+            isLoading={isLoading}
+            isActiveTimer={isActiveTimer}
+          />
         </div>
         <div>
           <Profile />
